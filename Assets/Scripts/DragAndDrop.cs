@@ -20,9 +20,10 @@ public class DragAndDrop : MonoBehaviour {
 
 	void OnMouseDrag () {
 		mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		if(this.tag == "Operator")// && snap == false)
+		if(this.tag == "Operator")
 		{
 			this.transform.position = new Vector3(mousePos.x, mousePos.y, -1.0f);
+			gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 			dragging = true;
 		}
 		else
@@ -36,13 +37,12 @@ public class DragAndDrop : MonoBehaviour {
 			if(Physics.Raycast (ray, out hit))
 			{
 				if(hit.transform.gameObject.tag == "OperatorBox")
-				{
 					this.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
-					snap = true;
-				}
-				else if(hit.transform.gameObject.tag == "Unsnap")
-					snap = false;
 			}
 		}
+	}
+
+	void OnMouseUp () {
+
 	}
 }
