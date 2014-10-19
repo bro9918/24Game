@@ -6,6 +6,7 @@ public class DragAndDrop : MonoBehaviour {
 	private Vector3 mousePos;
 	private bool dragging;
 	private bool snap;
+	private GameObject grabbedObject;
 
 	// Use this for initialization
 	void Start () {
@@ -22,12 +23,12 @@ public class DragAndDrop : MonoBehaviour {
 		mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		if(this.tag == "Operator")
 		{
-			this.transform.position = new Vector3(mousePos.x, mousePos.y, -1.0f);
-			gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+			grabbedObject = gameObject;
+			grabbedObject.transform.position = new Vector3(mousePos.x, mousePos.y, -1.0f);
+			grabbedObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 			dragging = true;
 		}
-		else
-			dragging = false;
+
 
 		if(dragging == true)
 		{
@@ -37,12 +38,13 @@ public class DragAndDrop : MonoBehaviour {
 			if(Physics.Raycast (ray, out hit))
 			{
 				if(hit.transform.gameObject.tag == "OperatorBox")
-					this.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
+					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
 			}
 		}
 	}
 
 	void OnMouseUp () {
-
+		dragging = false;
+		grabbedObject.layer = LayerMask.NameToLayer("Default");
 	}
 }
