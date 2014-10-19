@@ -21,7 +21,7 @@ public class DragAndDrop : MonoBehaviour {
 
 	void OnMouseDrag () {
 		mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		if(this.tag == "Operator")
+		if(this.tag == "Operator" || this.tag == "Ingredient")
 		{
 			grabbedObject = gameObject;
 			grabbedObject.transform.position = new Vector3(mousePos.x, mousePos.y, -1.0f);
