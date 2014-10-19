@@ -8,6 +8,8 @@ public class DragAndDrop : MonoBehaviour {
 	private bool snap;
 	private GameObject grabbedObject;
 
+	public string chosenOperator;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -37,8 +39,10 @@ public class DragAndDrop : MonoBehaviour {
 			
 			if(Physics.Raycast (ray, out hit))
 			{
-				if(hit.transform.gameObject.tag == "OperatorBox")
+				if(hit.transform.gameObject.tag == "OperatorBox") {
 					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
+					hit.transform.gameObject.GetComponent<OperatorBox>().chosenOperator = this.name;
+				}
 			}
 		}
 	}
