@@ -18,6 +18,7 @@ public class DragAndDrop : MonoBehaviour {
 	private bool locationSet;
 	private CuttingBoard cuttingBoardScript;
 	private float secondRowYOffset = 0.9f;
+	public int maxIngredients = 2;
 
 	public string chosenOperator;
 
@@ -44,6 +45,14 @@ public class DragAndDrop : MonoBehaviour {
 			{
 				wasOnCuttingBoard = true;
 				ingredientCount--;
+				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
+				{
+					if(cuttingBoardScript.ingredients[i].name == gameObject.name)
+					{
+						cuttingBoardScript.ingredients[i] = null;
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -70,7 +79,7 @@ public class DragAndDrop : MonoBehaviour {
 					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
 					hit.transform.gameObject.GetComponent<OperatorBox>().chosenOperator = this.name;
 				}
-				if(hit.transform.gameObject.tag == "Cutting Board") {
+				if(hit.transform.gameObject.tag == "Cutting Board" && ingredientCount < maxIngredients) {
 					ingredientSlotXPos = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 					ingredientSlotYPos = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
 					for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
@@ -99,22 +108,11 @@ public class DragAndDrop : MonoBehaviour {
 		grabbedObject.layer = LayerMask.NameToLayer("Default");
 		if(this.tag == "Ingredient")
 		{
-			if(Vector3.Distance(grabbedObject.transform.position, slotLocation) != 0 && wasOnCuttingBoard == true)
+			if(Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0)
 			{
 				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
 				{
-					if(cuttingBoardScript.ingredients[i].name == gameObject.name)
-					{
-						cuttingBoardScript.ingredients[i] = null;
-						break;
-					}
-				}
-			}
-			else if(Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0)
-			{
-				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
-				{
-					if(cuttingBoardScript.ingredients[i] == null)
+					if(cuttingBoardScript.ingredients[i] == null && ingredientCount < maxIngredients)
 					{
 						cuttingBoardScript.ingredients[i] = gameObject;
 						break;
