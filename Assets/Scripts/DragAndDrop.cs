@@ -18,13 +18,18 @@ public class DragAndDrop : MonoBehaviour {
 	private bool locationSet;
 	private CuttingBoard cuttingBoardScript;
 	private float secondRowYOffset = 0.9f;
-	public int maxIngredients = 2;
+	private GameObject showNameObject;
+	private GUIText showName;
 
 	public string chosenOperator;
 
 	// Use this for initialization
 	void Start () {
 		cuttingBoardScript = GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>();
+
+		showNameObject = GameObject.FindGameObjectWithTag("Show Name");
+		showName = showNameObject.GetComponent<GUIText>();
+		showName.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -79,7 +84,7 @@ public class DragAndDrop : MonoBehaviour {
 					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
 					hit.transform.gameObject.GetComponent<OperatorBox>().chosenOperator = this.name;
 				}
-				if(hit.transform.gameObject.tag == "Cutting Board" && ingredientCount < maxIngredients) {
+				if(hit.transform.gameObject.tag == "Cutting Board" && ingredientCount < cuttingBoardScript.maxIngredients) {
 					ingredientSlotXPos = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 					ingredientSlotYPos = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
 					for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
@@ -112,7 +117,7 @@ public class DragAndDrop : MonoBehaviour {
 			{
 				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
 				{
-					if(cuttingBoardScript.ingredients[i] == null && ingredientCount < maxIngredients)
+					if(cuttingBoardScript.ingredients[i] == null && ingredientCount < cuttingBoardScript.maxIngredients)
 					{
 						cuttingBoardScript.ingredients[i] = gameObject;
 						break;
@@ -123,5 +128,17 @@ public class DragAndDrop : MonoBehaviour {
 			previousIngredient = gameObject;
 			locationSet = false;
 		}
+	}
+
+	void OnMouseOver () {
+		if(showName.enabled != true)
+			showName.enabled = true;
+		showName.text = gameObject.name;
+		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		showName.transform.position = mousePos;
+	}
+
+	void OnMouseExit (){
+		showName.enabled = false;
 	}
 }
