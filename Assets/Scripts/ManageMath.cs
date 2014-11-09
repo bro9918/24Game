@@ -4,7 +4,6 @@ using System.Collections;
 public class ManageMath : MonoBehaviour {
 
 	public int NumbersInvolved = 4;
-	public int OperandMaxNumber = 12; // must be > 2
 	public int TargetMaxNumber = 24;
 	public int TargetMinNumber = 24;
 
@@ -12,28 +11,33 @@ public class ManageMath : MonoBehaviour {
 	private ArrayList numberList;
 	
 	void Start () {
-		targetNumber = Random.Range(TargetMinNumber, TargetMaxNumber);
-		numberList = new ArrayList();
-		numberList.Add (targetNumber);
+		for (int i=0; i<101; i++) {
+			targetNumber = Random.Range(TargetMinNumber, TargetMaxNumber + 1);
+			numberList = new ArrayList();
+			numberList.Add (targetNumber);
 
-		// (recursively and randomly) pick a number to split from the available numbers in numberList
-		// until numberList.Count == NumbersInvolved
-		while (numberList.Count != NumbersInvolved) {
-			PickAndSplit(numberList);
-		}
+			// (recursively and randomly) pick a number to split from the available numbers in numberList
+			// until numberList.Count == NumbersInvolved
+			while (numberList.Count != NumbersInvolved) {
+				PickAndSplit(numberList);
+			}
 
-		string msg = "";
-		msg += targetNumber.ToString() + ": ";
-		foreach (var num in numberList) {
-			msg += num.ToString() + " ";	
+			string msg = "";
+			msg += targetNumber.ToString() + ": ";
+			foreach (var num in numberList) {
+				msg += num.ToString() + " ";	
+			}
+			Debug.Log(msg);
 		}
-		Debug.Log(msg);
 	}
 
 	public void PickAndSplit(ArrayList numbers) {
 		// randomly pick a number and split it
-		int indexToPick = Random.Range(0, numbers.Count-1);
+		int indexToPick = Random.Range(0, numbers.Count);
 		int numberToSplit = (int)numbers[indexToPick];
+		if (numberToSplit == 1 && numberToSplit == 0) {
+			return;
+		}
 		numbers.RemoveAt(indexToPick);
 		AddNumbers(SplitWithRandomOperator(numberToSplit));
 	}
@@ -47,20 +51,31 @@ public class ManageMath : MonoBehaviour {
 	}
 
 	public int[] SplitWithRandomOperator (int toSplit) {
-		int op = Random.Range(1,6);
+		ArrayList okOperations = new ArrayList();
+		if (toSplit > 1) {
+			okOperations.Add('a');
+			okOperations.Add('m');
+		}
+		if (toSplit < TargetMaxNumber) {
+			okOperations.Add('s');
+			if (toSplit < TargetMaxNumber / 2) { // don't div-split big numbers
+				okOperations.Add('d');
+			}
+		}
+
+		char op = (char)okOperations[Random.Range(0,okOperations.Count)];
+
 		switch (op) {
-			case 1:
-			case 2:
+			case 'a':
 				return SplitAdd(toSplit);
 				break;
-			case 3:
-			case 4:
+			case 's':
 				return SplitSub(toSplit);
 				break;
-			case 5:
+			case 'm':
 				return SplitMult(toSplit);
 				break;
-			case 6:
+			case 'd':
 				return SplitDiv(toSplit);
 				break;
 		}
@@ -78,17 +93,22 @@ public class ManageMath : MonoBehaviour {
 			}
 		}
 		int[] nums = new int[2];
-		nums[0] = (int)factors[Random.Range(1, factors.Count-1)];
+		nums[0] = (int)factors[Random.Range(1, factors.Count)];
 		nums[1] = prod / nums[0];
+		if (nums[0] > TargetMaxNumber * 2) throw new UnityException("" + nums[0].ToString());
+		if (nums[1] > TargetMaxNumber * 2) throw new UnityException("" + nums[1].ToString());
+
 
 		return nums;
 	}
 
 	public int[] SplitDiv (int quot) {
 		int[] nums = new int[2];
-		nums[0] = Random.Range(1, (targetNumber + 1) - quot);
+		nums[0] = Random.Range(1, (TargetMaxNumber/2 + 1) - quot + 1);
 		nums[1] = quot * nums[0];
-
+		if (nums[0] > TargetMaxNumber * 2 || nums[1] > TargetMaxNumber * 2) {
+			throw new UnityException("" + quot + "\n" + nums[0].ToString() + "\n" + nums[1].ToString());
+		}
 		return nums;
 	}
 
@@ -96,14 +116,17 @@ public class ManageMath : MonoBehaviour {
 		int[] nums = new int[2];
 		nums[0] = Random.Range (1, sum);
 		nums[1] = sum - nums[0];
-
+		if (nums[0] < 0) throw new UnityException("" + nums[0].ToString());
+		if (nums[1] < 0) throw new UnityException(sum.ToString() + " - " + nums[1].ToString());
 		return nums;
 	}
 
 	public int[] SplitSub (int diff) {
 		int[] nums = new int[2];
-		nums[0] = Random.Range (diff, OperandMaxNumber);
+		nums[0] = Random.Range (diff + 1, (int)(diff * 1.5f));
 		nums[1] = nums[0] - diff;
+		if (nums[0] > TargetMaxNumber * 2) throw new UnityException("" + nums[0].ToString());
+		if (nums[1] > TargetMaxNumber * 2) throw new UnityException(nums[0].ToString() + " - " + diff.ToString());
 		return nums;
 	}
 
