@@ -6,12 +6,12 @@ public class DragAndDrop : MonoBehaviour {
 	private Vector3 mousePos;
 	private bool dragging;
 	private bool snap;
+	public bool onBoard = false;
 	private GameObject grabbedObject;
 	public float xOffset = 0.38f;
 	public float yOffset = 0.35f;
 	private static GameObject previousIngredient;
-	private float ingredientSlotXPos;
-	private float ingredientSlotYPos;
+
 	private Vector3 slotLocation;
 	private bool wasOnCuttingBoard;
 	private bool locationSet;
@@ -41,23 +41,12 @@ public class DragAndDrop : MonoBehaviour {
 		if(this.tag == "Ingredient")
 		{
 			grabbedObject = gameObject;
-			if(Vector3.Distance(grabbedObject.transform.position, slotLocation) != 0)
+			if(onBoard)
 			{
-				wasOnCuttingBoard = false;
+				cuttingBoardScript.ingredientCount--;
+				cuttingBoardScript.ingredients.Remove(grabbedObject);
 			}
-			else
-			{
-				wasOnCuttingBoard = true;
-				CuttingBoard.ingredientCount--;
-				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
-				{
-					if(cuttingBoardScript.ingredients[i].name == gameObject.name)
-					{
-						cuttingBoardScript.ingredients[i] = null;
-						break;
-					}
-				}
-			}
+
 		}
 	}
 
@@ -79,28 +68,25 @@ public class DragAndDrop : MonoBehaviour {
 			
 			if(Physics.Raycast (ray, out hit))
 			{
-				if(hit.transform.gameObject.tag == "OperatorBox") {
-					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
-					hit.transform.gameObject.GetComponent<OperatorBox>().chosenOperator = this.name;
-				}
-				if(hit.transform.gameObject.tag == "Cutting Board" && CuttingBoard.ingredientCount < cuttingBoardScript.maxIngredients) {
-					ingredientSlotXPos = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
-					ingredientSlotYPos = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
-					for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
+				if(hit.transform.gameObject.tag == "Cutting Board" && cuttingBoardScript.ingredientCount < cuttingBoardScript.maxIngredients) {
+					cuttingBoardScript.currentSlotPos.x = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
+					cuttingBoardScript.currentSlotPos.y = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
+
+					for(int i = 0; i < cuttingBoardScript.ingredients.Count; i++)
 					{
 						if(cuttingBoardScript.ingredients[i] == null)
 							break;
-						if(cuttingBoardScript.ingredients[i] != null && i < 3)
-							ingredientSlotXPos += cuttingBoardScript.ingredients[i].collider.bounds.size.x;
-						if(cuttingBoardScript.ingredients[i] != null && i == 3)
+						if(i < 3)
+							cuttingBoardScript.currentSlotPos.x += (cuttingBoardScript.ingredients[i] as GameObject).collider.bounds.size.x;
+						if(i == 3)
 						{
-							ingredientSlotXPos = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
-							ingredientSlotYPos -= secondRowYOffset;
+							cuttingBoardScript.currentSlotPos.x = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
+							cuttingBoardScript.currentSlotPos.y -= secondRowYOffset;
 						}
-						if(cuttingBoardScript.ingredients[i] != null && i > 3)
-							ingredientSlotXPos += cuttingBoardScript.ingredients[i].collider.bounds.size.x;
+						if(i > 3)
+							cuttingBoardScript.currentSlotPos.x += (cuttingBoardScript.ingredients[i] as GameObject).collider.bounds.size.x;
 					}
-					slotLocation = new Vector3(ingredientSlotXPos, ingredientSlotYPos, -1.0f);
+					slotLocation = new Vector3(cuttingBoardScript.currentSlotPos.x, cuttingBoardScript.currentSlotPos.y, -1.0f);
 					grabbedObject.transform.position = slotLocation;
 				}
 			}
@@ -114,15 +100,9 @@ public class DragAndDrop : MonoBehaviour {
 		{
 			if(Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0)
 			{
-				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
-				{
-					if(cuttingBoardScript.ingredients[i] == null && CuttingBoard.ingredientCount < cuttingBoardScript.maxIngredients)
-					{
-						cuttingBoardScript.ingredients[i] = gameObject;
-						break;
-					}
-				}
-				CuttingBoard.ingredientCount++;
+				cuttingBoardScript.ingredients.Add(gameObject);
+				cuttingBoardScript.ingredientCount++;
+				onBoard = true;
 			}
 			previousIngredient = gameObject;
 			locationSet = false;
