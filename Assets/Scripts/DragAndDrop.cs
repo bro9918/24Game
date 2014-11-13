@@ -19,7 +19,7 @@ public class DragAndDrop : MonoBehaviour {
 	private CuttingBoard cuttingBoardScript;
 	private float secondRowYOffset = 0.9f;
 	private GameObject showNameObject;
-	private GUIText showName;
+	private TextMesh showName;
 
 	public string chosenOperator;
 
@@ -28,8 +28,8 @@ public class DragAndDrop : MonoBehaviour {
 		cuttingBoardScript = GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>();
 
 		showNameObject = GameObject.FindGameObjectWithTag("Show Name");
-		showName = showNameObject.GetComponent<GUIText>();
-		showName.enabled = false;
+		showName = showNameObject.GetComponent<TextMesh>();
+		showName.renderer.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -131,14 +131,14 @@ public class DragAndDrop : MonoBehaviour {
 	}
 
 	void OnMouseOver () {
-		if(showName.enabled != true)
-			showName.enabled = true;
+		if(showName.renderer.enabled != true)
+			showName.renderer.enabled = true;
 		showName.text = gameObject.name;
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		showName.transform.position = mousePos;
+		showName.transform.position = new Vector3(mousePos.x, mousePos.y, 0);
 	}
 
 	void OnMouseExit (){
-		showName.enabled = false;
+		showName.renderer.enabled = false;
 	}
 }

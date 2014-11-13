@@ -5,8 +5,7 @@ public class CuttingBoard : MonoBehaviour {
 
 	public GameObject[] ingredients = new GameObject[8];
 	public int maxIngredients = 2;
-	public GUIText maxIngredientsDisplay;
-	public GUIText showName;
+	public TextMesh maxIngredientsDisplay;
 
 	// Use this for initialization
 	void Start () {
