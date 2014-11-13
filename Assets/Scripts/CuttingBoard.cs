@@ -5,8 +5,8 @@ public class CuttingBoard : MonoBehaviour {
 
 	public GameObject[] ingredients = new GameObject[8];
 	public int maxIngredients = 2;
-	public GUIText maxIngredientsDisplay;
-	public GUIText showName;
+	public TextMesh maxIngredientsDisplay;
+	public static int ingredientCount = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -17,8 +17,8 @@ public class CuttingBoard : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void LateUpdate () {
+		maxIngredientsDisplay.text = (maxIngredients - ingredientCount).ToString();
 	}
 
 }

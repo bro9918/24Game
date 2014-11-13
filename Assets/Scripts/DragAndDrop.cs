@@ -10,7 +10,6 @@ public class DragAndDrop : MonoBehaviour {
 	public float xOffset = 0.38f;
 	public float yOffset = 0.35f;
 	private static GameObject previousIngredient;
-	private static int ingredientCount = 0;
 	private float ingredientSlotXPos;
 	private float ingredientSlotYPos;
 	private Vector3 slotLocation;
@@ -19,7 +18,7 @@ public class DragAndDrop : MonoBehaviour {
 	private CuttingBoard cuttingBoardScript;
 	private float secondRowYOffset = 0.9f;
 	private GameObject showNameObject;
-	private GUIText showName;
+	private TextMesh showName;
 
 	public string chosenOperator;
 
@@ -28,8 +27,8 @@ public class DragAndDrop : MonoBehaviour {
 		cuttingBoardScript = GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>();
 
 		showNameObject = GameObject.FindGameObjectWithTag("Show Name");
-		showName = showNameObject.GetComponent<GUIText>();
-		showName.enabled = false;
+		showName = showNameObject.GetComponent<TextMesh>();
+		showName.renderer.enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -49,7 +48,7 @@ public class DragAndDrop : MonoBehaviour {
 			else
 			{
 				wasOnCuttingBoard = true;
-				ingredientCount--;
+				CuttingBoard.ingredientCount--;
 				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
 				{
 					if(cuttingBoardScript.ingredients[i].name == gameObject.name)
@@ -84,7 +83,7 @@ public class DragAndDrop : MonoBehaviour {
 					grabbedObject.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
 					hit.transform.gameObject.GetComponent<OperatorBox>().chosenOperator = this.name;
 				}
-				if(hit.transform.gameObject.tag == "Cutting Board" && ingredientCount < cuttingBoardScript.maxIngredients) {
+				if(hit.transform.gameObject.tag == "Cutting Board" && CuttingBoard.ingredientCount < cuttingBoardScript.maxIngredients) {
 					ingredientSlotXPos = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 					ingredientSlotYPos = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
 					for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
@@ -117,13 +116,13 @@ public class DragAndDrop : MonoBehaviour {
 			{
 				for(int i = 0; i < cuttingBoardScript.ingredients.Length; i++)
 				{
-					if(cuttingBoardScript.ingredients[i] == null && ingredientCount < cuttingBoardScript.maxIngredients)
+					if(cuttingBoardScript.ingredients[i] == null && CuttingBoard.ingredientCount < cuttingBoardScript.maxIngredients)
 					{
 						cuttingBoardScript.ingredients[i] = gameObject;
 						break;
 					}
 				}
-				ingredientCount++;
+				CuttingBoard.ingredientCount++;
 			}
 			previousIngredient = gameObject;
 			locationSet = false;
@@ -131,14 +130,14 @@ public class DragAndDrop : MonoBehaviour {
 	}
 
 	void OnMouseOver () {
-		if(showName.enabled != true)
-			showName.enabled = true;
+		if(showName.renderer.enabled != true)
+			showName.renderer.enabled = true;
 		showName.text = gameObject.name;
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		showName.transform.position = mousePos;
+		showName.transform.position = new Vector3(mousePos.x, mousePos.y, 0);
 	}
 
 	void OnMouseExit (){
-		showName.enabled = false;
+		showName.renderer.enabled = false;
 	}
 }
