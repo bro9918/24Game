@@ -18,7 +18,7 @@ public class DragAndDrop : MonoBehaviour {
 	private CuttingBoard cuttingBoardScript;
 	private float secondRowYOffset = 0.9f;
 	private GameObject showNameObject;
-	private TextMesh showName;
+	public TextMesh showName;
 
 	public string chosenOperator;
 
