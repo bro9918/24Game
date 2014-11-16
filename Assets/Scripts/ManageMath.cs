@@ -68,16 +68,12 @@ public class ManageMath : MonoBehaviour {
 		switch (op) {
 			case 'a':
 				return SplitAdd(toSplit);
-				break;
 			case 's':
 				return SplitSub(toSplit);
-				break;
 			case 'm':
 				return SplitMult(toSplit);
-				break;
 			case 'd':
 				return SplitDiv(toSplit);
-				break;
 		}
 		return null;
 	}

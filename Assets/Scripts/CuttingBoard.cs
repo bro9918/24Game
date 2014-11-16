@@ -3,15 +3,16 @@ using System.Collections;
 
 public class CuttingBoard : MonoBehaviour {
 
-	public GameObject[] ingredients = new GameObject[8];
+	public ArrayList ingredients = new ArrayList();
 	public int maxIngredients = 2;
 	public TextMesh maxIngredientsDisplay;
-	public static int ingredientCount = 0;
+	public int ingredientCount = 0;
+	public Vector2 currentSlotPos;
 
 	// Use this for initialization
 	void Start () {
 		if(ingredients == null)
-			ingredients = new GameObject[8];
+			ingredients = new ArrayList();
 		
 		maxIngredientsDisplay.text = maxIngredients.ToString();
 	}
