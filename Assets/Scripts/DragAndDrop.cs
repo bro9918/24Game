@@ -93,6 +93,10 @@ public class DragAndDrop : MonoBehaviour {
 					slotLocation = new Vector3(cuttingBoardScript.currentSlotPos.x, cuttingBoardScript.currentSlotPos.y, -1.0f);
 					grabbedObject.transform.position = slotLocation;
 				}
+				else if (hit.transform.gameObject.tag == "FoodBox") {
+					slotLocation = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
+					grabbedObject.transform.position = slotLocation;
+				}
 			}
 		}
 	}
