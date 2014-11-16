@@ -107,6 +107,10 @@ public class DragAndDrop : MonoBehaviour {
 				onBoard = true;
 				IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
 			}
+			else
+			{
+				onBoard = false;
+			}
 			previousIngredient = gameObject;
 			locationSet = false;
 		}
