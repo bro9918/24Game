@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Linq;
 
 public class DragAndDrop : MonoBehaviour {
 
@@ -21,39 +23,42 @@ public class DragAndDrop : MonoBehaviour {
 	public TextMesh showName;
 
 	public string chosenOperator;
+	private Vector3 originalPosition;
+
+	public event Action<GameObject[], int> IngredientsChanged;
 
 	// Use this for initialization
-	void Start () {
+	void Start() {
 		cuttingBoardScript = GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>();
 
 		showNameObject = GameObject.FindGameObjectWithTag("Show Name");
 		showName = showNameObject.GetComponent<TextMesh>();
 		showName.renderer.enabled = false;
+
+		originalPosition = transform.position;
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update() {
 	
 
 	}
 
 	void OnMouseDown() {
-		if(this.tag == "Ingredient")
-		{
+		if (this.tag == "Ingredient") {
 			grabbedObject = gameObject;
-			if(onBoard)
-			{
+			if (onBoard) {
 				cuttingBoardScript.ingredientCount--;
 				cuttingBoardScript.ingredients.Remove(grabbedObject);
+				IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
 			}
 
 		}
 	}
 
-	void OnMouseDrag () {
+	void OnMouseDrag() {
 		mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		if(this.tag == "Operator" || this.tag == "Ingredient")
-		{
+		if (this.tag == "Operator" || this.tag == "Ingredient") {
 			grabbedObject = gameObject;
 			grabbedObject.transform.position = new Vector3(mousePos.x, mousePos.y, -1.0f);
 			grabbedObject.layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -61,30 +66,29 @@ public class DragAndDrop : MonoBehaviour {
 		}
 
 
-		if(dragging == true)
-		{
+		if (dragging == true) {
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
 			
-			if(Physics.Raycast (ray, out hit))
-			{
-				if(hit.transform.gameObject.tag == "Cutting Board" && cuttingBoardScript.ingredientCount < cuttingBoardScript.maxIngredients) {
+			if (Physics.Raycast(ray, out hit)) {
+				if (hit.transform.gameObject.tag == "Cutting Board" && cuttingBoardScript.ingredientCount < cuttingBoardScript.maxIngredients) {
 					cuttingBoardScript.currentSlotPos.x = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 					cuttingBoardScript.currentSlotPos.y = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
 
-					for(int i = 0; i < cuttingBoardScript.ingredients.Count; i++)
-					{
-						if(cuttingBoardScript.ingredients[i] == null)
+					for (int i = 0; i < cuttingBoardScript.ingredients.Count; i++) {
+						if (cuttingBoardScript.ingredients[i] == null) {
 							break;
-						if(i < 3)
+						}
+						if (i < 3) {
 							cuttingBoardScript.currentSlotPos.x += (cuttingBoardScript.ingredients[i] as GameObject).collider.bounds.size.x;
-						if(i == 3)
-						{
+						}
+						if (i == 3) {
 							cuttingBoardScript.currentSlotPos.x = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 							cuttingBoardScript.currentSlotPos.y -= secondRowYOffset;
 						}
-						if(i > 3)
+						if (i > 3) {
 							cuttingBoardScript.currentSlotPos.x += (cuttingBoardScript.ingredients[i] as GameObject).collider.bounds.size.x;
+						}
 					}
 					slotLocation = new Vector3(cuttingBoardScript.currentSlotPos.x, cuttingBoardScript.currentSlotPos.y, -1.0f);
 					grabbedObject.transform.position = slotLocation;
@@ -93,16 +97,15 @@ public class DragAndDrop : MonoBehaviour {
 		}
 	}
 
-	void OnMouseUp () {
+	void OnMouseUp() {
 		dragging = false;
 		grabbedObject.layer = LayerMask.NameToLayer("Default");
-		if(this.tag == "Ingredient")
-		{
-			if(Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0)
-			{
+		if (this.tag == "Ingredient") {
+			if (Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0) {
 				cuttingBoardScript.ingredients.Add(gameObject);
 				cuttingBoardScript.ingredientCount++;
 				onBoard = true;
+				IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
 			}
 			else
 			{
@@ -113,15 +116,16 @@ public class DragAndDrop : MonoBehaviour {
 		}
 	}
 
-	void OnMouseOver () {
-		if(showName.renderer.enabled != true)
+	void OnMouseOver() {
+		if (showName.renderer.enabled != true) {
 			showName.renderer.enabled = true;
+		}
 		showName.text = gameObject.name;
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		showName.transform.position = new Vector3(mousePos.x, mousePos.y, 0);
 	}
 
-	void OnMouseExit (){
+	void OnMouseExit() {
 		showName.renderer.enabled = false;
 	}
 }
