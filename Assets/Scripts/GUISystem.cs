@@ -43,7 +43,7 @@ public class GUISystem : MonoBehaviour {
 	}
 
 	IEnumerator MoveCamera(Camera camera, Vector3 destination, float speed) {
-		const float updatesPerSecond = 30;
+		const float updatesPerSecond = 60;
 		Vector3 path = destination - camera.transform.position;
 		for (int i = 0; i < path.magnitude * updatesPerSecond / speed; ++i) {
 			camera.transform.position += path.normalized * speed / updatesPerSecond;
@@ -151,19 +151,6 @@ class IngredientsState : GUIState {
 			guiSystem.ChangeGUIState(new MenuState(guiSystem));
 		}
 		GUILayout.EndArea();
-	}
-
-	IEnumerator MoveCuttingBoard() {
-		const float updatesPerSecond = 30;
-		const float speed = 24;
-		GameObject cuttingBoard = GameObject.FindGameObjectWithTag("Cutting Board");
-		Vector3 path = Vector3.right * 12;
-		for (int i = 0; i < path.magnitude * updatesPerSecond / speed; ++i) {
-			foreach (GameObject go in cuttingBoard.GetComponent<CuttingBoard>().ingredients.Cast<GameObject>().Concat(Enumerable.Repeat(cuttingBoard, 1))) {
-				go.transform.position += path.normalized * speed / updatesPerSecond;
-				yield return new WaitForSeconds(1 / updatesPerSecond);
-			}
-		}
 	}
 }
 
