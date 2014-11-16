@@ -3,6 +3,7 @@ using System.Collections;
 
 public class NutritionalInformation : MonoBehaviour {
 
+	private float calories;
 	private float fat;
 	private float sodium;
 	private float protein;
@@ -17,6 +18,7 @@ public class NutritionalInformation : MonoBehaviour {
 	void Start () {
 		if(gameObject.name == "Grapes")
 		{
+			calories = 104.0f;
 			fat = 0.0f;
 			sodium = 3.0f;
 			protein = 1.0f;
@@ -29,6 +31,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Radish")
 		{
+			calories = 116.0f;
 			fat = 0.0f;
 			sodium = 45.0f;
 			protein = 1.0f;
@@ -41,6 +44,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Yellow Pepper")
 		{
+			calories = 50.0f;
 			fat = 0.0f;
 			sodium = 4.0f;
 			protein = 2.0f;
@@ -53,6 +57,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Mushroom")
 		{
+			calories = 70.0f;
 			fat = 0.0f;
 			sodium = 4.0f;
 			protein = 2.0f;
@@ -65,6 +70,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Tomato")
 		{
+			calories = 27.0f;
 			fat = 0.0f;
 			sodium = 7.0f;
 			protein = 1.0f;
@@ -77,6 +83,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Apple")
 		{
+			calories = 125.0f;
 			fat = 0.0f;
 			sodium = 1.0f;
 			protein = 0.0f;
@@ -89,6 +96,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Chicken")
 		{
+			calories = 160.0f;
 			fat = 9.0f;
 			sodium = 67.0f;
 			protein = 20.0f;
@@ -101,6 +109,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Steak")
 		{
+			calories = 250.0f;
 			fat = 6.0f;
 			sodium = 118.0f;
 			protein = 49.0f;
@@ -125,6 +134,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Carrot")
 		{
+			calories = 52.0f;
 			fat = 0.0f;
 			sodium = 88.0f;
 			protein = 1.0f;
