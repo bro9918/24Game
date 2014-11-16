@@ -104,6 +104,10 @@ public class DragAndDrop : MonoBehaviour {
 				cuttingBoardScript.ingredientCount++;
 				onBoard = true;
 			}
+			else
+			{
+				onBoard = false;
+			}
 			previousIngredient = gameObject;
 			locationSet = false;
 		}
