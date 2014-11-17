@@ -26,6 +26,8 @@ public class DragAndDrop : MonoBehaviour {
 	private Vector3 originalPosition;
 
 	public event Action<GameObject[], int> IngredientsChanged;
+	public event Action<GameObject> FoodBoxDrop;
+	public event Action OnMouseDownEvent;
 
 	// Use this for initialization
 	void Start() {
@@ -54,6 +56,7 @@ public class DragAndDrop : MonoBehaviour {
 			}
 
 		}
+		OnMouseDownEvent();
 	}
 
 	void OnMouseDrag() {
@@ -92,10 +95,10 @@ public class DragAndDrop : MonoBehaviour {
 					}
 					slotLocation = new Vector3(cuttingBoardScript.currentSlotPos.x, cuttingBoardScript.currentSlotPos.y, -1.0f);
 					grabbedObject.transform.position = slotLocation;
-				}
-				else if (hit.transform.gameObject.tag == "FoodBox") {
+				} else if (hit.transform.gameObject.tag == "FoodBox") {
 					slotLocation = new Vector3(hit.transform.position.x, hit.transform.position.y, -1.0f);
 					grabbedObject.transform.position = slotLocation;
+					FoodBoxDrop(hit.transform.gameObject);
 				}
 			}
 		}
@@ -110,9 +113,7 @@ public class DragAndDrop : MonoBehaviour {
 				cuttingBoardScript.ingredientCount++;
 				onBoard = true;
 				IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
-			}
-			else
-			{
+			} else {
 				onBoard = false;
 			}
 			previousIngredient = gameObject;

@@ -10,11 +10,11 @@ public class ManageMath : MonoBehaviour {
 
 	private int targetNumber;
 
-	private ArrayList numberList;
+	public ArrayList numberList;
 
 	public static ManageMath instance;
 	
-	void Awake () {
+	void Awake() {
 
 		if (instance == null) {
 			instance = this;
@@ -23,7 +23,7 @@ public class ManageMath : MonoBehaviour {
 		TargetNumber = Random.Range(TargetMinNumber, TargetMaxNumber + 1);
 		targetNumber = TargetNumber;
 		numberList = new ArrayList();
-		numberList.Add (targetNumber);
+		numberList.Add(targetNumber);
 
 		// (recursively and randomly) pick a number to split from the available numbers in numberList
 		// until numberList.Count == NumbersInvolved
@@ -51,7 +51,7 @@ public class ManageMath : MonoBehaviour {
 		AddNumbers(SplitWithRandomOperator(numberToSplit));
 	}
 
-	public void AddNumbers (int[] toAdd) {
+	public void AddNumbers(int[] toAdd) {
 		if (toAdd.Length != 2) {
 			return;
 		}
@@ -59,7 +59,7 @@ public class ManageMath : MonoBehaviour {
 		numberList.Add(toAdd[1]);
 	}
 
-	public int[] SplitWithRandomOperator (int toSplit) {
+	public int[] SplitWithRandomOperator(int toSplit) {
 		ArrayList okOperations = new ArrayList();
 		if (toSplit > 1) {
 			okOperations.Add('a');
@@ -72,7 +72,7 @@ public class ManageMath : MonoBehaviour {
 			}
 		}
 
-		char op = (char)okOperations[Random.Range(0,okOperations.Count)];
+		char op = (char)okOperations[Random.Range(0, okOperations.Count)];
 
 		switch (op) {
 			case 'a':
@@ -87,7 +87,7 @@ public class ManageMath : MonoBehaviour {
 		return null;
 	}
 
-	public int[] SplitMult (int prod) {
+	public int[] SplitMult(int prod) {
 		// find factors
 		ArrayList factors = new ArrayList();
 		factors.Add(prod);
@@ -100,16 +100,20 @@ public class ManageMath : MonoBehaviour {
 		int[] nums = new int[2];
 		nums[0] = (int)factors[Random.Range(1, factors.Count)];
 		nums[1] = prod / nums[0];
-		if (nums[0] > TargetMaxNumber * 2) throw new UnityException("" + nums[0].ToString());
-		if (nums[1] > TargetMaxNumber * 2) throw new UnityException("" + nums[1].ToString());
+		if (nums[0] > TargetMaxNumber * 2) {
+			throw new UnityException("" + nums[0].ToString());
+		}
+		if (nums[1] > TargetMaxNumber * 2) {
+			throw new UnityException("" + nums[1].ToString());
+		}
 
 
 		return nums;
 	}
 
-	public int[] SplitDiv (int quot) {
+	public int[] SplitDiv(int quot) {
 		int[] nums = new int[2];
-		nums[0] = Random.Range(1, (TargetMaxNumber/2 + 1) - quot + 1);
+		nums[0] = Random.Range(1, (TargetMaxNumber / 2 + 1) - quot + 1);
 		nums[1] = quot * nums[0];
 		if (nums[0] > TargetMaxNumber * 2 || nums[1] > TargetMaxNumber * 2) {
 			throw new UnityException("" + quot + "\n" + nums[0].ToString() + "\n" + nums[1].ToString());
@@ -117,26 +121,34 @@ public class ManageMath : MonoBehaviour {
 		return nums;
 	}
 
-	public int[] SplitAdd (int sum) {
+	public int[] SplitAdd(int sum) {
 		int[] nums = new int[2];
-		nums[0] = Random.Range (1, sum);
+		nums[0] = Random.Range(1, sum);
 		nums[1] = sum - nums[0];
-		if (nums[0] < 0) throw new UnityException("" + nums[0].ToString());
-		if (nums[1] < 0) throw new UnityException(sum.ToString() + " - " + nums[1].ToString());
+		if (nums[0] < 0) {
+			throw new UnityException("" + nums[0].ToString());
+		}
+		if (nums[1] < 0) {
+			throw new UnityException(sum.ToString() + " - " + nums[1].ToString());
+		}
 		return nums;
 	}
 
-	public int[] SplitSub (int diff) {
+	public int[] SplitSub(int diff) {
 		int[] nums = new int[2];
-		nums[0] = Random.Range (diff + 1, (int)(diff * 1.5f));
+		nums[0] = Random.Range(diff + 1, (int)(diff * 1.5f));
 		nums[1] = nums[0] - diff;
-		if (nums[0] > TargetMaxNumber * 2) throw new UnityException("" + nums[0].ToString());
-		if (nums[1] > TargetMaxNumber * 2) throw new UnityException(nums[0].ToString() + " - " + diff.ToString());
+		if (nums[0] > TargetMaxNumber * 2) {
+			throw new UnityException("" + nums[0].ToString());
+		}
+		if (nums[1] > TargetMaxNumber * 2) {
+			throw new UnityException(nums[0].ToString() + " - " + diff.ToString());
+		}
 		return nums;
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update() {
 	
 	}
 }
