@@ -5,30 +5,39 @@ public class ManageMath : MonoBehaviour {
 
 	public int NumbersInvolved = 4;
 	public int TargetMaxNumber = 24;
-	public int TargetMinNumber = 24;
+	public int TargetMinNumber = 240;
+	public int TargetNumber;
 
 	private int targetNumber;
+
 	private ArrayList numberList;
+
+	public static ManageMath instance;
 	
-	void Start () {
-		for (int i=0; i<101; i++) {
-			targetNumber = Random.Range(TargetMinNumber, TargetMaxNumber + 1);
-			numberList = new ArrayList();
-			numberList.Add (targetNumber);
+	void Awake () {
 
-			// (recursively and randomly) pick a number to split from the available numbers in numberList
-			// until numberList.Count == NumbersInvolved
-			while (numberList.Count != NumbersInvolved) {
-				PickAndSplit(numberList);
-			}
-
-			string msg = "";
-			msg += targetNumber.ToString() + ": ";
-			foreach (var num in numberList) {
-				msg += num.ToString() + " ";	
-			}
-			Debug.Log(msg);
+		if (instance == null) {
+			instance = this;
 		}
+
+		TargetNumber = Random.Range(TargetMinNumber, TargetMaxNumber + 1);
+		targetNumber = TargetNumber;
+		numberList = new ArrayList();
+		numberList.Add (targetNumber);
+
+		// (recursively and randomly) pick a number to split from the available numbers in numberList
+		// until numberList.Count == NumbersInvolved
+		while (numberList.Count != NumbersInvolved) {
+			PickAndSplit(numberList);
+		}
+
+		string msg = "";
+		msg += targetNumber.ToString() + ": ";
+		foreach (var num in numberList) {
+			msg += num.ToString() + " ";	
+		}
+		Debug.Log(msg);
+
 	}
 
 	public void PickAndSplit(ArrayList numbers) {
