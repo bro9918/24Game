@@ -3,16 +3,16 @@ using System.Collections;
 
 public class NutritionalInformation : MonoBehaviour {
 
-	private float calories;
-	private float fat;
-	private float sodium;
-	private float protein;
-	private float sugar;
+	public float calories;
+	public float fat;
+	public float sodium;
+	public float protein;
+	public float sugar;
 
-	private int vitaminA;
-	private int vitaminC;
-	private int calcium;
-	private int iron;
+	public int vitaminA;
+	public int vitaminC;
+	public int calcium;
+	public int iron;
 
 	// Use this for initialization
 	void Start () {
