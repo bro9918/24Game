@@ -53,28 +53,25 @@ public class CuttingBoard : MonoBehaviour {
 		maxIngredientsDisplay.text = maxIngredients.ToString();
 	}
 
-	void Update(){
-			if(ingredients.Count == maxIngredients)// && calculateFactTotals == false)
-			{
-				GameObject[] ingredientsArray = new GameObject[maxIngredients];
-				for(int i = 0; i < maxIngredients; i++)
-				{
-					ingredientsArray[i] = (GameObject)ingredients[i];
-				}
+	void Update() {
+		if (ingredients.Count == maxIngredients) {// && calculateFactTotals == false)
+			GameObject[] ingredientsArray = new GameObject[maxIngredients];
+			for (int i = 0; i < maxIngredients; i++) {
+				ingredientsArray[i] = (GameObject)ingredients[i];
+			}
 					
-				for(int i = 0; i < ingredients.Count; i++)
-				{
-					caloriesTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calories;
-					fatTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().fat;
-					sodiumTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().sodium;
-					proteinTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().protein;
-					sugarTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().sugar;
-					vitaminATotal += ingredientsArray[i].GetComponent<NutritionalInformation>().vitaminA;
-					vitaminCTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().vitaminC;
-					calciumTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calcium;
-					ironTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().iron;
-				}
-				caloriesText.text = caloriesTotal.ToString();
+			/*for (int i = 0; i < ingredients.Count; i++) {
+				caloriesTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calories;
+				fatTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().fat;
+				sodiumTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().sodium;
+				proteinTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().protein;
+				sugarTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().sugar;
+				vitaminATotal += ingredientsArray[i].GetComponent<NutritionalInformation>().vitaminA;
+				vitaminCTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().vitaminC;
+				calciumTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calcium;
+				ironTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().iron;
+			}
+			caloriesText.text = caloriesTotal.ToString();
 				fatText.text = fatTotal.ToString();
 				sodiumText.text = sodiumTotal.ToString();
 				proteinText.text = proteinTotal.ToString();
@@ -82,10 +79,10 @@ public class CuttingBoard : MonoBehaviour {
 				vitaminAText.text = vitaminATotal.ToString();
 				vitaminCText.text = vitaminCTotal.ToString();
 				calciumText.text = calciumTotal.ToString();
-				ironText.text = ironTotal.ToString();
-				//calculateFactTotals = true;
-			}
+				ironText.text = ironTotal.ToString();*/
+			//calculateFactTotals = true;
 		}
+	}
 	
 	// Update is called once per frame
 	void LateUpdate() {

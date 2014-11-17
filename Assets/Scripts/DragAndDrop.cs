@@ -27,7 +27,6 @@ public class DragAndDrop : MonoBehaviour {
 
 	public event Action<GameObject[], int> IngredientsChanged;
 	public event Action<GameObject> FoodBoxDrop;
-	public event Action OnMouseDownEvent;
 
 	// Use this for initialization
 	void Start() {
@@ -56,7 +55,6 @@ public class DragAndDrop : MonoBehaviour {
 			}
 
 		}
-		OnMouseDownEvent();
 	}
 
 	void OnMouseDrag() {

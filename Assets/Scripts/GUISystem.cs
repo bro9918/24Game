@@ -199,6 +199,7 @@ class GameState : GUIState {
 		{"Subtract", (x, y) => Math.Abs(x - y)},
 		{"Multiply", (x, y) => x * y},
 		{"Divide", (x, y) => {
+				Debug.Log(x + " ; " + y); 
 				int max = Math.Max(x, y);
 				int min = Math.Min(x, y);
 				if(max % min == 0) {
@@ -248,6 +249,31 @@ class GameState : GUIState {
 				foodBoxToIngredients[foodBox] = ingredient;
 			};
 		}
+		foreach (OperatorBox op1 in GameObject.Find("Operators").GetComponentsInChildren<OperatorBox>()) {
+			op1.OnMouseDownEvent += opBox => {
+				Debug.Log("Sdlfjskdfjsdkfjlsk");
+				if (foodBoxToIngredients.Count != 2) {
+					Debug.Log("Sdlfk");
+					return;
+				}
+				GameObject[] ingredients = foodBoxToIngredients.Values.ToArray();
+				Debug.Log(ingredients.Length);
+				Func<int, int, int?> op;
+				int? answer;
+				if (operations.TryGetValue(opBox.name, out op) && (answer = op(ingredientsToNums[ingredients[0]], ingredientsToNums[ingredients[1]])).HasValue) {
+					GameObject fusion = (GameObject)GameObject.Instantiate(genericFusionPrefab);
+					genericFusions.Add(fusion);
+					ingredientsToNums[fusion] = answer.Value;
+					foreach (GameObject ingredient in foodBoxToIngredients.Values) {
+						ingredient.transform.position += Vector3.up * 1000;
+					}
+					foodBoxToIngredients.Clear();
+					fusion.GetComponent<DragAndDrop>().FoodBoxDrop += foodBox => {
+						foodBoxToIngredients[foodBox] = fusion;
+					};
+				}
+			};
+		}
 	}
 
 	public override void OnGUI() {
@@ -271,7 +297,7 @@ class GameState : GUIState {
 		}
 	}
 
-	public override void OnMouseDown() {
+	/*public override void OnMouseDown() {
 		Debug.Log("Sdlfjskdfjsdkfjlsk");
 		if (foodBoxToIngredients.Count != 2) {
 			Debug.Log("Sdlfk");
@@ -297,5 +323,5 @@ class GameState : GUIState {
 				};
 			}
 		}
-	}
+	}*/
 }
