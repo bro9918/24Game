@@ -244,9 +244,10 @@ class GameState : GUIState {
 		int i = 0;
 		//TODO: Remember to reset the event when resetting level.
 		foreach (GameObject ingredient in Ingredients) {
+			var ingredient2 = ingredient;
 			ingredientsToNums[ingredient] = (int)ManageMath.instance.numberList[i++];
-			ingredient.GetComponent<DragAndDrop>().FoodBoxDrop += foodBox => {
-				foodBoxToIngredients[foodBox] = ingredient;
+			ingredient2.GetComponent<DragAndDrop>().FoodBoxDrop += foodBox => {
+				foodBoxToIngredients[foodBox] = ingredient2;
 			};
 		}
 		foreach (OperatorBox op1 in GameObject.Find("Operators").GetComponentsInChildren<OperatorBox>()) {
