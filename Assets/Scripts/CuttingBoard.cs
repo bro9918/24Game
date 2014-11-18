@@ -54,13 +54,14 @@ public class CuttingBoard : MonoBehaviour {
 	}
 
 	void Update() {
-		if (ingredients.Count == maxIngredients) {// && calculateFactTotals == false)
+		if (ingredients.Count == maxIngredients && calculateFactTotals == false)
+		{
 			GameObject[] ingredientsArray = new GameObject[maxIngredients];
 			for (int i = 0; i < maxIngredients; i++) {
 				ingredientsArray[i] = (GameObject)ingredients[i];
 			}
 					
-			/*for (int i = 0; i < ingredients.Count; i++) {
+			for (int i = 0; i < ingredients.Count; i++) {
 				caloriesTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calories;
 				fatTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().fat;
 				sodiumTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().sodium;
@@ -79,9 +80,11 @@ public class CuttingBoard : MonoBehaviour {
 				vitaminAText.text = vitaminATotal.ToString();
 				vitaminCText.text = vitaminCTotal.ToString();
 				calciumText.text = calciumTotal.ToString();
-				ironText.text = ironTotal.ToString();*/
-			//calculateFactTotals = true;
+				ironText.text = ironTotal.ToString();
+			calculateFactTotals = true;
 		}
+		if(ingredients.Count == 0)
+			calculateFactTotals = false;
 	}
 	
 	// Update is called once per frame
