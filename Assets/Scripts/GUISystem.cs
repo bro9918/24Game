@@ -65,7 +65,7 @@ public class GUISystem : MonoBehaviour {
 	}
 }
 
-abstract class GUIState {
+public abstract class GUIState {
 	public abstract Vector3 CameraPosition { get; set; }
 	public virtual void OnGUI() {
 	}
@@ -209,7 +209,7 @@ class IngredientsState : GUIState {
 	}
 }
 
-class GameState : GUIState {
+public class GameState : GUIState {
 	private static GameObject genericFusionPrefab;
 
 	private static Dictionary<string, Func<int, int, int?>> operations = new Dictionary<string, Func<int, int, int?>> {
@@ -245,13 +245,13 @@ class GameState : GUIState {
 
 	public HashSet<GameObject> Ingredients { get; set; }
 
-	private Dictionary<GameObject, GameObject> foodBoxToIngredients;
+	public Dictionary<GameObject, GameObject> foodBoxToIngredients;
 
-	private Dictionary<GameObject, int> ingredientsToNums;
+	public Dictionary<GameObject, int> ingredientsToNums;
 
-	private HashSet<GameObject> genericFusions;
+	public HashSet<GameObject> genericFusions;
 
-	private int activeIngredients;
+	public int activeIngredients;
 
 	public override Vector3 CameraPosition { get; set; }
 
@@ -275,9 +275,9 @@ class GameState : GUIState {
 		}
 		foreach (OperatorBox op1 in GameObject.Find("Operators").GetComponentsInChildren<OperatorBox>()) {
 			op1.OnMouseDownEvent += opBox => {
-				Debug.Log("Sdlfjskdfjsdkfjlsk");
+				//Debug.Log("Sdlfjskdfjsdkfjlsk");
 				if (foodBoxToIngredients.Count != 2) {
-					Debug.Log("Sdlfk");
+			//		Debug.Log("Sdlfk");
 					return;
 				}
 				GameObject[] ingredients = foodBoxToIngredients.Values.ToArray();
@@ -330,6 +330,7 @@ class GameState : GUIState {
 			genericFusions.Clear();
 			activeIngredients = Ingredients.Count;
 			gameWon = false;
+			//Destroy(genericFusionPrefab);
 		}
 		GUI.enabled = gameWon;
 		if (GUILayout.Button(gameWon ? "Continue" : string.Empty, gameWon ? guiSystem.ourSkin.button : guiSystem.ourSkin.box, GUILayout.ExpandHeight(true))) {
@@ -402,13 +403,20 @@ class NutritionState : GUIState {
 
 	public override void OnGUI() {
 		if(!showGUI) {
-			Debug.Log("WHYYYYYY?");
+			//Debug.Log("WHYYYYYY?");
 			return;
 		}
 		GUILayout.BeginArea(Trace(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f)));
 		if(GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
 			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
+			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredientCount = 0;
+			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
+//			GameState gs = new GameState();
+//			Ingredients.Clear();
+//			foodBoxToIngredients.Clear();
+//			ingredientsToNums.Clear();
+//			genericFusions.Clear();
 		}
 		GUILayout.EndArea();
 	}

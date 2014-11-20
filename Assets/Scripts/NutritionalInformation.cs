@@ -122,6 +122,7 @@ public class NutritionalInformation : MonoBehaviour {
 		}
 		if(gameObject.name == "Cookie")
 		{
+			calories = 78.0f;
 			fat = 5.0f;
 			sodium = 55.0f;
 			protein = 1.0f;
