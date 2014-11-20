@@ -57,6 +57,12 @@ public class GUISystem : MonoBehaviour {
 			yield return new WaitForSeconds(1 / updatesPerSecond);
 		}
 	}
+
+	public void ResetGame() {
+		foreach(var kvp in IngredientPositions) {
+			kvp.Key.transform.position = kvp.Value;
+		}
+	}
 }
 
 abstract class GUIState {
@@ -80,7 +86,8 @@ class MenuState : GUIState {
 	public override void OnGUI() {
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth / 4, Camera.main.pixelHeight * .6f, Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 3));
 		if (GUILayout.Button("Start", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
-			guiSystem.ChangeGUIState(new IngredientsState(guiSystem));
+			IngredientsState next = new IngredientsState(guiSystem);
+			guiSystem.ChangeGUIState(next, next.ShowGUI);
 		}
 		if (GUILayout.Button("Instructions", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			guiSystem.ChangeGUIState(new InstructionState(guiSystem));
@@ -152,6 +159,8 @@ class IngredientsState : GUIState {
 
 	private bool validIngredients;
 
+	private bool showGUI;
+
 	public override Vector3 CameraPosition { get; set; }
 
 	public IngredientsState(GUISystem system) {
@@ -164,9 +173,17 @@ class IngredientsState : GUIState {
 				validIngredients = count == cuttingBoard.maxIngredients;
 			};
 		}
+		showGUI = false;
+	}
+
+	public void ShowGUI() {
+		showGUI = true;
 	}
 
 	public override void OnGUI() {
+		if(!showGUI) {
+			return;
+		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .54f, Camera.main.pixelHeight * .71f, Camera.main.pixelWidth / 3, Camera.main.pixelWidth / 5));
 		GUI.enabled = validIngredients;
 		if (GUILayout.Button("Cook!", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
@@ -175,12 +192,13 @@ class IngredientsState : GUIState {
 			foreach (Transform moveMe in moveUs) {
 				moveMe.parent = Camera.main.transform;
 			}
-			var thing = new GameState(guiSystem);
-			guiSystem.ChangeGUIState(thing, () => {
+			var next = new GameState(guiSystem);
+			guiSystem.ChangeGUIState(next, () => {
 				foreach (var kvp in origParent) {
 					kvp.Key.parent = kvp.Value;
 				}
-				thing.OriginalPositions = thing.Ingredients.ToDictionary(x => x.transform, x => x.transform.position);
+				next.OriginalPositions = next.Ingredients.ToDictionary(x => x.transform, x => x.transform.position);
+				next.ShowGUI();
 			});
 		}
 		GUI.enabled = true;
@@ -221,6 +239,8 @@ class GameState : GUIState {
 
 	private bool gameWon;
 
+	private bool showGUI;
+
 	public Dictionary<Transform, Vector3> OriginalPositions { get; set; }
 
 	public HashSet<GameObject> Ingredients { get; set; }
@@ -230,6 +250,8 @@ class GameState : GUIState {
 	private Dictionary<GameObject, int> ingredientsToNums;
 
 	private HashSet<GameObject> genericFusions;
+
+	private int activeIngredients;
 
 	public override Vector3 CameraPosition { get; set; }
 
@@ -241,6 +263,7 @@ class GameState : GUIState {
 		genericFusions = new HashSet<GameObject>();
 		ingredientsToNums = new Dictionary<GameObject, int>();
 		Ingredients = new HashSet<GameObject>(GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Cast<GameObject>());
+		activeIngredients = Ingredients.Count;
 		int i = 0;
 		//TODO: Remember to reset the event when resetting level.
 		foreach (GameObject ingredient in Ingredients) {
@@ -262,7 +285,14 @@ class GameState : GUIState {
 				Func<int, int, int?> op;
 				int? answer;
 				if (operations.TryGetValue(opBox.name, out op) && (answer = op(ingredientsToNums[ingredients[0]], ingredientsToNums[ingredients[1]])).HasValue) {
+					if(activeIngredients == 2 && answer.Value == GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().TargetNumber) {
+						gameWon = true;
+					}
 					GameObject fusion = (GameObject)GameObject.Instantiate(genericFusionPrefab);
+					do {
+						fusion.transform.position = new Vector3(UnityEngine.Random.Range(20f, 26f), UnityEngine.Random.Range(2f, -4f), -1);
+					} while(fusion.transform.position.x > 24 && fusion.transform.position.y < 0);
+					fusion.name = ingredients[0].name + "\n" + ingredients[1].name;
 					genericFusions.Add(fusion);
 					ingredientsToNums[fusion] = answer.Value;
 					foreach (GameObject ingredient in foodBoxToIngredients.Values) {
@@ -272,28 +302,49 @@ class GameState : GUIState {
 					fusion.GetComponent<DragAndDrop>().FoodBoxDrop += foodBox => {
 						foodBoxToIngredients[foodBox] = fusion;
 					};
+					--activeIngredients;
 				}
 			};
 		}
+		showGUI = false;
+	}
+
+	public void ShowGUI() {
+		showGUI = true;
 	}
 
 	public override void OnGUI() {
+		if(!showGUI) {
+			return;
+		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .55f, Camera.main.pixelHeight / 6, Camera.main.pixelWidth / 4, Camera.main.pixelHeight / 4));
 		if (GUILayout.Button("Reset", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			foreach (var kvp in OriginalPositions) {
 				kvp.Key.position = kvp.Value;
 			}
+			foodBoxToIngredients.Clear();
+			foreach(var gf in genericFusions) {
+				GameObject.Destroy(gf);
+				ingredientsToNums.Remove(gf);
+			}
+			genericFusions.Clear();
+			activeIngredients = Ingredients.Count;
+			gameWon = false;
 		}
 		GUI.enabled = gameWon;
 		if (GUILayout.Button(gameWon ? "Continue" : string.Empty, gameWon ? guiSystem.ourSkin.button : guiSystem.ourSkin.box, GUILayout.ExpandHeight(true))) {
-			;
+			foreach(var ingredient in Ingredients) {
+				ingredient.GetComponent<DragAndDrop>().FoodBoxDrop = null;
+			}
+			NutritionState next = new NutritionState(guiSystem);
+			guiSystem.ChangeGUIState(next, next.ShowGUI);
 		}
 		GUI.enabled = true;
 		GUILayout.EndArea();
 		foreach (var kvp in ingredientsToNums) {
 			Vector3 screenPoint = Camera.main.WorldToScreenPoint(kvp.Key.transform.position);
 			GUILayout.BeginArea(new Rect(screenPoint.x, Camera.main.pixelHeight - screenPoint.y, 200, 100));
-			GUILayout.Label(kvp.Value.ToString(), guiSystem.ourSkin.label);
+			GUI.Label(new Rect(0, 0, 200, 100), kvp.Value.ToString(), guiSystem.ourSkin.label);
 			GUILayout.EndArea();
 		}
 	}
@@ -325,4 +376,40 @@ class GameState : GUIState {
 			}
 		}
 	}*/
+}
+
+class NutritionState : GUIState {
+	private GUISystem guiSystem;
+
+	private bool showGUI;
+
+	public override Vector3 CameraPosition { get; set; }
+
+	public NutritionState(GUISystem system) {
+		guiSystem = system;
+		CameraPosition = GameObject.Find("NutritionCameraPosition").transform.position;
+		showGUI = false;
+	}
+
+	public void ShowGUI() {
+		showGUI = true;
+	}
+
+	private T Trace<T>(T x) {
+		Debug.Log(x.ToString());
+		return x;
+	}
+
+	public override void OnGUI() {
+		if(!showGUI) {
+			Debug.Log("WHYYYYYY?");
+			return;
+		}
+		GUILayout.BeginArea(Trace(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f)));
+		if(GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
+			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
+		}
+		GUILayout.EndArea();
+	}
 }
