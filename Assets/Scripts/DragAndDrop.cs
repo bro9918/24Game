@@ -49,10 +49,10 @@ public class DragAndDrop : MonoBehaviour {
 		if (this.tag == "Ingredient") {
 			grabbedObject = gameObject;
 			if (onBoard) {
-				cuttingBoardScript.ingredientCount--;
+				cuttingBoardScript.ingredients.Remove(this.gameObject);
 				cuttingBoardScript.ingredients.Remove(grabbedObject);
 				if(IngredientsChanged != null) {
-					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
+					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredients.Count);
 				}
 			}
 
@@ -74,7 +74,7 @@ public class DragAndDrop : MonoBehaviour {
 			RaycastHit hit;
 			
 			if (Physics.Raycast(ray, out hit)) {
-				if (hit.transform.gameObject.tag == "Cutting Board" && cuttingBoardScript.ingredientCount < cuttingBoardScript.maxIngredients) {
+				if (hit.transform.gameObject.tag == "Cutting Board" && cuttingBoardScript.ingredients.Count < cuttingBoardScript.maxIngredients) {
 					cuttingBoardScript.currentSlotPos.x = hit.transform.position.x - hit.collider.bounds.extents.x + grabbedObject.collider.bounds.extents.x + xOffset;
 					cuttingBoardScript.currentSlotPos.y = hit.transform.position.y + hit.collider.bounds.extents.y - grabbedObject.collider.bounds.extents.y - yOffset;
 
@@ -110,10 +110,9 @@ public class DragAndDrop : MonoBehaviour {
 		if (this.tag == "Ingredient") {
 			if (Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0) {
 				cuttingBoardScript.ingredients.Add(gameObject);
-				cuttingBoardScript.ingredientCount++;
 				onBoard = true;
 				if(IngredientsChanged != null) {
-					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredientCount);
+					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredients.Count);
 				}
 			} else {
 				onBoard = false;

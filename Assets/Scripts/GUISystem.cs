@@ -191,6 +191,7 @@ class IngredientsState : GUIState {
 			Dictionary<Transform, Transform> origParent = moveUs.ToDictionary(x => x, x => x.parent);
 			foreach (Transform moveMe in moveUs) {
 				moveMe.parent = Camera.main.transform;
+				moveMe.gameObject.GetComponent<DragAndDrop>().onBoard = false;
 			}
 			var next = new GameState(guiSystem);
 			guiSystem.ChangeGUIState(next, () => {
@@ -410,7 +411,6 @@ class NutritionState : GUIState {
 		if(GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
 			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
-			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredientCount = 0;
 			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
 //			GameState gs = new GameState();
 //			Ingredients.Clear();

@@ -17,7 +17,6 @@ public class CuttingBoard : MonoBehaviour {
 
 	//public int maxIngredients = 2;
 	public TextMesh maxIngredientsDisplay;
-	public int ingredientCount = 0;
 	public Vector2 currentSlotPos;
 
 	private float caloriesTotal;
@@ -90,7 +89,7 @@ public class CuttingBoard : MonoBehaviour {
 	
 	// Update is called once per frame
 	void LateUpdate() {
-		maxIngredientsDisplay.text = (maxIngredients - ingredientCount).ToString();
+		maxIngredientsDisplay.text = (maxIngredients - ingredients.Count).ToString();
 	}
 
 }
