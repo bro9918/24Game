@@ -73,14 +73,14 @@ public class CuttingBoard : MonoBehaviour {
 				ironTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().iron;
 			}
 			caloriesText.text = caloriesTotal.ToString();
-				fatText.text = fatTotal.ToString();
-				sodiumText.text = sodiumTotal.ToString();
-				proteinText.text = proteinTotal.ToString();
-				sugarText.text = sugarTotal.ToString();
-				vitaminAText.text = vitaminATotal.ToString();
-				vitaminCText.text = vitaminCTotal.ToString();
-				calciumText.text = calciumTotal.ToString();
-				ironText.text = ironTotal.ToString();
+				fatText.text = fatTotal.ToString() + "g";
+				sodiumText.text = sodiumTotal.ToString() + "mg";
+				proteinText.text = proteinTotal.ToString() + "g";
+				sugarText.text = sugarTotal.ToString() + "g";
+				vitaminAText.text = vitaminATotal.ToString() + "%";
+				vitaminCText.text = vitaminCTotal.ToString() + "%";
+				calciumText.text = calciumTotal.ToString() + "%";
+				ironText.text = ironTotal.ToString() + "%";
 			calculateFactTotals = true;
 		}
 		if(ingredients.Count == 0)
