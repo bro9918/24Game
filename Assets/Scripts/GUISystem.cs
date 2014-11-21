@@ -218,7 +218,6 @@ public class GameState : GUIState {
 		{"Subtract", (x, y) => Math.Abs(x - y)},
 		{"Multiply", (x, y) => x * y},
 		{"Divide", (x, y) => {
-				Debug.Log(x + " ; " + y); 
 				int max = Math.Max(x, y);
 				int min = Math.Min(x, y);
 				if(max % min == 0) {
@@ -266,7 +265,6 @@ public class GameState : GUIState {
 		Ingredients = new HashSet<GameObject>(GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Cast<GameObject>());
 		activeIngredients = Ingredients.Count;
 		int i = 0;
-		//TODO: Remember to reset the event when resetting level.
 		foreach (GameObject ingredient in Ingredients) {
 			var ingredient2 = ingredient;
 			ingredientsToNums[ingredient] = (int)ManageMath.instance.numberList[i++];
@@ -276,13 +274,10 @@ public class GameState : GUIState {
 		}
 		foreach (OperatorBox op1 in GameObject.Find("Operators").GetComponentsInChildren<OperatorBox>()) {
 			op1.OnMouseDownEvent += opBox => {
-				//Debug.Log("Sdlfjskdfjsdkfjlsk");
 				if (foodBoxToIngredients.Count != 2) {
-			//		Debug.Log("Sdlfk");
 					return;
 				}
 				GameObject[] ingredients = foodBoxToIngredients.Values.ToArray();
-				Debug.Log(ingredients.Length);
 				Func<int, int, int?> op;
 				int? answer;
 				if (operations.TryGetValue(opBox.name, out op) && (answer = op(ingredientsToNums[ingredients[0]], ingredientsToNums[ingredients[1]])).HasValue) {
@@ -292,7 +287,7 @@ public class GameState : GUIState {
 					GameObject fusion = (GameObject)GameObject.Instantiate(genericFusionPrefab);
 					do {
 						fusion.transform.position = new Vector3(UnityEngine.Random.Range(20f, 26f), UnityEngine.Random.Range(2f, -4f), -1);
-					} while(fusion.transform.position.x > 24 && fusion.transform.position.y < 0);
+					} while(fusion.transform.position.x > 24 && fusion.transform.position.y > 0);
 					fusion.name = ingredients[0].name + "\n" + ingredients[1].name;
 					genericFusions.Add(fusion);
 					ingredientsToNums[fusion] = answer.Value;
@@ -338,6 +333,9 @@ public class GameState : GUIState {
 			foreach(var ingredient in Ingredients) {
 				ingredient.GetComponent<DragAndDrop>().FoodBoxDrop = null;
 			}
+			foreach(var gf in genericFusions) {
+				GameObject.Destroy(gf);
+			}
 			NutritionState next = new NutritionState(guiSystem);
 			guiSystem.ChangeGUIState(next, next.ShowGUI);
 		}
@@ -352,13 +350,10 @@ public class GameState : GUIState {
 	}
 
 	/*public override void OnMouseDown() {
-		Debug.Log("Sdlfjskdfjsdkfjlsk");
 		if (foodBoxToIngredients.Count != 2) {
-			Debug.Log("Sdlfk");
 			return;
 		}
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		Debug.Log("Ray: " + ray + "; mp: " + Input.mousePosition); 
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit)) {
 			GameObject[] ingredients = foodBoxToIngredients.Values.ToArray();
@@ -397,17 +392,11 @@ class NutritionState : GUIState {
 		showGUI = true;
 	}
 
-	private T Trace<T>(T x) {
-		Debug.Log(x.ToString());
-		return x;
-	}
-
 	public override void OnGUI() {
 		if(!showGUI) {
-			//Debug.Log("WHYYYYYY?");
 			return;
 		}
-		GUILayout.BeginArea(Trace(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f)));
+		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f));
 		if(GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
 			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);

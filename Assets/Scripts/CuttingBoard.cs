@@ -53,7 +53,6 @@ public class CuttingBoard : MonoBehaviour {
 	}
 
 	void Update() {
-		//Debug.Log(ingredientCount);
 		if (ingredients.Count == maxIngredients && calculateFactTotals == false)
 		{
 			GameObject[] ingredientsArray = new GameObject[maxIngredients];

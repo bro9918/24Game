@@ -41,8 +41,6 @@ public class ManageMath : MonoBehaviour {
 		foreach (var num in numberList) {
 			msg += num.ToString() + " ";	
 		}
-		Debug.Log(msg);
-
 	}
 
 	public void PickAndSplit(ArrayList numbers) {

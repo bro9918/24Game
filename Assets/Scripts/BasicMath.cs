@@ -51,7 +51,6 @@ public class BasicMath : MonoBehaviour {
 		}
 		else if(numOfBoxes == 2){
 			answer = randomAnswerGenTwoBoxes(number1, number2, number3);
-			print(answer);
 		}
 		answerObject.text = answer.ToString();
 
@@ -209,10 +208,6 @@ public class BasicMath : MonoBehaviour {
 				attempt = DoMathTwoBoxes(number1, number2, number3, operatorBoxObject1.chosenOperator, operatorBoxObject2.chosenOperator);
 			}
 
-		}
-
-		if(attempt == answer){
-			print("VICTORY");
 		}
 	}
 
