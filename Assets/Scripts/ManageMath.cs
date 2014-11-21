@@ -19,8 +19,8 @@ public class ManageMath : MonoBehaviour {
 		if (instance == null) {
 			instance = this;
 		}
+		numberList = new ArrayList ();
 		GenerateMath ();
-		numberList = new ArrayList();
 	}
 
 	public void GenerateMath() {
