@@ -412,6 +412,7 @@ class NutritionState : GUIState {
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
 			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
 			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
+			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().GenerateMath();
 //			GameState gs = new GameState();
 //			Ingredients.Clear();
 //			foodBoxToIngredients.Clear();

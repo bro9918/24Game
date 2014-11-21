@@ -19,10 +19,15 @@ public class ManageMath : MonoBehaviour {
 		if (instance == null) {
 			instance = this;
 		}
+		GenerateMath ();
+		numberList = new ArrayList();
+	}
 
+	public void GenerateMath() {
+	
 		TargetNumber = Random.Range(TargetMinNumber, TargetMaxNumber + 1);
 		targetNumber = TargetNumber;
-		numberList = new ArrayList();
+		numberList.Clear ();
 		numberList.Add(targetNumber);
 
 		// (recursively and randomly) pick a number to split from the available numbers in numberList
@@ -30,7 +35,7 @@ public class ManageMath : MonoBehaviour {
 		while (numberList.Count != NumbersInvolved) {
 			PickAndSplit(numberList);
 		}
-
+		
 		string msg = "";
 		msg += targetNumber.ToString() + ": ";
 		foreach (var num in numberList) {
