@@ -59,7 +59,7 @@ public class GUISystem : MonoBehaviour {
 	}
 
 	public void ResetGame() {
-		foreach(var kvp in IngredientPositions) {
+		foreach (var kvp in IngredientPositions) {
 			kvp.Key.transform.position = kvp.Value;
 		}
 	}
@@ -91,6 +91,10 @@ class MenuState : GUIState {
 		}
 		if (GUILayout.Button("Instructions", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			guiSystem.ChangeGUIState(new InstructionState(guiSystem));
+		}
+		// Application.Quit() doesn't work in the Unity editor or the web player; do not show button in these cases
+		if (!Application.isEditor && !Application.isWebPlayer && GUILayout.Button("Exit", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+			Application.Quit();
 		}
 		GUILayout.EndArea();
 	}
@@ -181,7 +185,7 @@ class IngredientsState : GUIState {
 	}
 
 	public override void OnGUI() {
-		if(!showGUI) {
+		if (!showGUI) {
 			return;
 		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .54f, Camera.main.pixelHeight * .71f, Camera.main.pixelWidth / 3, Camera.main.pixelWidth / 5));
@@ -281,7 +285,7 @@ public class GameState : GUIState {
 				Func<int, int, int?> op;
 				int? answer;
 				if (operations.TryGetValue(opBox.name, out op) && (answer = op(ingredientsToNums[ingredients[0]], ingredientsToNums[ingredients[1]])).HasValue) {
-					if(activeIngredients == 2 && answer.Value == GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().TargetNumber) {
+					if (activeIngredients == 2 && answer.Value == GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().TargetNumber) {
 						gameWon = true;
 					}
 					GameObject fusion = (GameObject)GameObject.Instantiate(genericFusionPrefab);
@@ -310,7 +314,7 @@ public class GameState : GUIState {
 	}
 
 	public override void OnGUI() {
-		if(!showGUI) {
+		if (!showGUI) {
 			return;
 		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .55f, Camera.main.pixelHeight / 6, Camera.main.pixelWidth / 4, Camera.main.pixelHeight / 4));
@@ -319,7 +323,7 @@ public class GameState : GUIState {
 				kvp.Key.position = kvp.Value;
 			}
 			foodBoxToIngredients.Clear();
-			foreach(var gf in genericFusions) {
+			foreach (var gf in genericFusions) {
 				GameObject.Destroy(gf);
 				ingredientsToNums.Remove(gf);
 			}
@@ -330,10 +334,10 @@ public class GameState : GUIState {
 		}
 		GUI.enabled = gameWon;
 		if (GUILayout.Button(gameWon ? "Continue" : string.Empty, gameWon ? guiSystem.ourSkin.button : guiSystem.ourSkin.box, GUILayout.ExpandHeight(true))) {
-			foreach(var ingredient in Ingredients) {
+			foreach (var ingredient in Ingredients) {
 				ingredient.GetComponent<DragAndDrop>().FoodBoxDrop = null;
 			}
-			foreach(var gf in genericFusions) {
+			foreach (var gf in genericFusions) {
 				GameObject.Destroy(gf);
 			}
 			NutritionState next = new NutritionState(guiSystem);
@@ -393,11 +397,11 @@ class NutritionState : GUIState {
 	}
 
 	public override void OnGUI() {
-		if(!showGUI) {
+		if (!showGUI) {
 			return;
 		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f));
-		if(GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+		if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
 			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
 			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
