@@ -128,32 +128,24 @@ class InstructionState : GUIState {
 
 	public override void OnGUI() {
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth / 4, Camera.main.pixelHeight * .6f, Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 3));
-		scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(Camera.main.pixelHeight / 4));
+		scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(Camera.main.pixelHeight / 6));
 		GUILayout.TextArea(paragraphs[currentPageNumber], guiSystem.ourSkin.textArea, GUILayout.ExpandHeight(true));
 		GUILayout.EndScrollView();
-		GUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
-		Action backButton = () => {
-			if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true), GUILayout.Width(Camera.main.pixelWidth / 4))) {
-				guiSystem.ChangeGUIState(new MenuState(guiSystem));
+		GUILayout.BeginHorizontal();
+		foreach (bool next in new bool[] { false, true }) {
+			if (next && currentPageNumber == paragraphs.Length - 1 || !next && currentPageNumber == 0) {
+				GUI.enabled = false;
 			}
-		};
-		Action<bool> pageMove = next => {
 			if (GUILayout.Button(next ? ">" : "<", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true), GUILayout.Width(Camera.main.pixelWidth / 4))) {
 				currentPageNumber += next ? 1 : -1;
-				scrollPos = new Vector2(Camera.main.pixelWidth * .7f, Camera.main.pixelHeight * .6f);
+				scrollPos = new Vector2(0, 0);//new Vector2(Camera.main.pixelWidth * .7f, Camera.main.pixelHeight * .6f);
 			}
-		};
-		if (currentPageNumber == 0) {
-			backButton();
-		} else {
-			pageMove(false);
-		}
-		if (currentPageNumber == paragraphs.Length - 1) {
-			backButton();
-		} else {
-			pageMove(true);
+			GUI.enabled = true;
 		}
 		GUILayout.EndHorizontal();
+		if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))) {
+			guiSystem.ChangeGUIState(new MenuState(guiSystem));
+		}
 		GUILayout.EndArea();
 	}
 }
@@ -332,6 +324,23 @@ public class GameState : GUIState {
 			gameWon = false;
 			//Destroy(genericFusionPrefab);
 		}
+		if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+			foreach (var ingredient in Ingredients) {
+				ingredient.GetComponent<DragAndDrop>().FoodBoxDrop = null;
+			}
+			foreach (var gf in genericFusions) {
+				GameObject.Destroy(gf);
+			}
+			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
+			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
+			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
+			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().GenerateMath();
+			//			GameState gs = new GameState();
+			//			Ingredients.Clear();
+			//			foodBoxToIngredients.Clear();
+			//			ingredientsToNums.Clear();
+			//			genericFusions.Clear();
+		}
 		GUI.enabled = gameWon;
 		if (GUILayout.Button(gameWon ? "Continue" : string.Empty, gameWon ? guiSystem.ourSkin.button : guiSystem.ourSkin.box, GUILayout.ExpandHeight(true))) {
 			foreach (var ingredient in Ingredients) {
@@ -396,21 +405,41 @@ class NutritionState : GUIState {
 		showGUI = true;
 	}
 
+	private class FakeTuple {
+		public string ButtonName { get; set; }
+		public GUIState NextState { get; set; }
+		public string CameraName { get; set; }
+	}
+
 	public override void OnGUI() {
 		if (!showGUI) {
 			return;
 		}
-		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .1f));
-		if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
-			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
-			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
-			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
-			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().GenerateMath();
+		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .2f));
+		IngredientsState ingredientsState = new IngredientsState(guiSystem);
+		ingredientsState.ShowGUI();
+		foreach (var fakeTuple in new[] {
+			new FakeTuple {
+				ButtonName = "Play Again",
+				NextState = ingredientsState,
+				CameraName = "IngredientsCameraPosition"
+			},
+			new FakeTuple {
+				ButtonName = "Main Menu",
+				NextState = new MenuState(guiSystem),
+				CameraName = "MenuCameraPosition"
+			} }) {
+			if (GUILayout.Button(fakeTuple.ButtonName, guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+				Camera.main.transform.position = GameObject.Find(fakeTuple.CameraName).transform.position;
+				guiSystem.ChangeGUIState(fakeTuple.NextState, guiSystem.ResetGame);
+				GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
+				GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().GenerateMath();
 //			GameState gs = new GameState();
 //			Ingredients.Clear();
 //			foodBoxToIngredients.Clear();
 //			ingredientsToNums.Clear();
 //			genericFusions.Clear();
+			}
 		}
 		GUILayout.EndArea();
 	}

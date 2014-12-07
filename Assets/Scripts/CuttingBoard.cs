@@ -53,13 +53,22 @@ public class CuttingBoard : MonoBehaviour {
 	}
 
 	void Update() {
-		if (ingredients.Count == maxIngredients && calculateFactTotals == false)
-		{
+		if (ingredients.Count == maxIngredients && calculateFactTotals == false) {
 			GameObject[] ingredientsArray = new GameObject[maxIngredients];
 			for (int i = 0; i < maxIngredients; i++) {
 				ingredientsArray[i] = (GameObject)ingredients[i];
 			}
-					
+
+			caloriesTotal = 0;
+			fatTotal = 0;
+			sodiumTotal = 0;
+			proteinTotal = 0;
+			sugarTotal = 0;
+			vitaminATotal = 0;
+			vitaminCTotal = 0;
+			calciumTotal = 0;
+			ironTotal = 0;
+
 			for (int i = 0; i < ingredients.Count; i++) {
 				caloriesTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().calories;
 				fatTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().fat;
@@ -72,18 +81,19 @@ public class CuttingBoard : MonoBehaviour {
 				ironTotal += ingredientsArray[i].GetComponent<NutritionalInformation>().iron;
 			}
 			caloriesText.text = caloriesTotal.ToString();
-				fatText.text = fatTotal.ToString() + "g";
-				sodiumText.text = sodiumTotal.ToString() + "mg";
-				proteinText.text = proteinTotal.ToString() + "g";
-				sugarText.text = sugarTotal.ToString() + "g";
-				vitaminAText.text = vitaminATotal.ToString() + "%";
-				vitaminCText.text = vitaminCTotal.ToString() + "%";
-				calciumText.text = calciumTotal.ToString() + "%";
-				ironText.text = ironTotal.ToString() + "%";
+			fatText.text = fatTotal.ToString() + "g";
+			sodiumText.text = sodiumTotal.ToString() + "mg";
+			proteinText.text = proteinTotal.ToString() + "g";
+			sugarText.text = sugarTotal.ToString() + "g";
+			vitaminAText.text = vitaminATotal.ToString() + "%";
+			vitaminCText.text = vitaminCTotal.ToString() + "%";
+			calciumText.text = calciumTotal.ToString() + "%";
+			ironText.text = ironTotal.ToString() + "%";
 			calculateFactTotals = true;
 		}
-		if(ingredients.Count == 0)
+		if (ingredients.Count == 0) {
 			calculateFactTotals = false;
+		}
 	}
 	
 	// Update is called once per frame
