@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 
 public class GUISystem : MonoBehaviour {
-	public TextAsset instructions;
+	public Texture2D[] images;
 	public GameObject genericFusionPrefab;
 	public GUISkin ourSkin;
 
@@ -14,9 +14,11 @@ public class GUISystem : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
-		InstructionState.SetInstructions(instructions.text);
+		InstructionState.SetInstructions(images);
 		GameState.SetGenericFusionPrefab(genericFusionPrefab);
-		ChangeGUIState(new MenuState(this));
+		var firstState = new MenuState(this);
+		firstState.ShowGUI();
+		ChangeGUIState(firstState);
 		IngredientPositions = GameObject.FindGameObjectsWithTag("Ingredient").ToDictionary(x => x, x => x.transform.position);
 	}
 	
@@ -26,7 +28,9 @@ public class GUISystem : MonoBehaviour {
 	}
 
 	void OnGUI() {
-		currentState.OnGUI();
+		if (currentState != null) {
+			currentState.OnGUI();
+		}
 	}
 
 	void OnMouseDown() {
@@ -75,21 +79,31 @@ public abstract class GUIState {
 
 class MenuState : GUIState {
 	private GUISystem guiSystem;
+	private bool showGUI;
 
 	public override Vector3 CameraPosition { get; set; }
 
 	public MenuState(GUISystem system) {
 		guiSystem = system;
 		CameraPosition = GameObject.Find("MenuCameraPosition").transform.position;
+		showGUI = false;
+	}
+
+	public void ShowGUI() {
+		showGUI = true;
 	}
 
 	public override void OnGUI() {
+		if (!showGUI) {
+			return;
+		}
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth / 4, Camera.main.pixelHeight * .6f, Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 3));
 		if (GUILayout.Button("Start", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
 			IngredientsState next = new IngredientsState(guiSystem);
 			guiSystem.ChangeGUIState(next, next.ShowGUI);
 		}
 		if (GUILayout.Button("Instructions", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
+			GameObject.Find("math_fusion").renderer.enabled = false;
 			guiSystem.ChangeGUIState(new InstructionState(guiSystem));
 		}
 		// Application.Quit() doesn't work in the Unity editor or the web player; do not show button in these cases
@@ -101,50 +115,46 @@ class MenuState : GUIState {
 }
 
 class InstructionState : GUIState {
-	private static string[] paragraphs;
+	private static Texture2D[] images;
 
-	static InstructionState() {
-		paragraphs = null;
-	}
-
-	public static void SetInstructions(string instructions) {
-		if (paragraphs == null) {
-			paragraphs = instructions.Replace("\r", "").Split(new string[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
-		}
+	public static void SetInstructions(Texture2D[] imgs) {
+		images = imgs;
 	}
 
 	private GUISystem guiSystem;
 	private int currentPageNumber;
-	private Vector2 scrollPos;
 
 	public override Vector3 CameraPosition { get; set; }
 
 	public InstructionState(GUISystem system) {
 		guiSystem = system;
 		currentPageNumber = 0;
-		scrollPos = new Vector2(Camera.main.pixelWidth * .7f, Camera.main.pixelHeight * .6f);
 		CameraPosition = GameObject.Find("MenuCameraPosition").transform.position;
 	}
 
+	private Rect FromCenter(Vector3 center, Vector2 size) {
+		return new Rect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+	}
+
 	public override void OnGUI() {
-		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth / 4, Camera.main.pixelHeight * .6f, Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 3));
-		scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(Camera.main.pixelHeight / 6));
-		GUILayout.TextArea(paragraphs[currentPageNumber], guiSystem.ourSkin.textArea, GUILayout.ExpandHeight(true));
-		GUILayout.EndScrollView();
+		GameObject cuttingBoard = GameObject.FindGameObjectWithTag("Cutting Board");
+		GUI.DrawTexture(new Rect(Camera.main.pixelWidth * 0.3f, Camera.main.pixelHeight * 0.1f, Camera.main.pixelWidth * 0.4f, Camera.main.pixelWidth * 0.5f), images[currentPageNumber], ScaleMode.ScaleToFit);
+		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth / 4, Camera.main.pixelHeight * .8f, Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 6));
 		GUILayout.BeginHorizontal();
 		foreach (bool next in new bool[] { false, true }) {
-			if (next && currentPageNumber == paragraphs.Length - 1 || !next && currentPageNumber == 0) {
+			if (next && currentPageNumber == images.Length - 1 || !next && currentPageNumber == 0) {
 				GUI.enabled = false;
 			}
 			if (GUILayout.Button(next ? ">" : "<", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true), GUILayout.Width(Camera.main.pixelWidth / 4))) {
 				currentPageNumber += next ? 1 : -1;
-				scrollPos = new Vector2(0, 0);//new Vector2(Camera.main.pixelWidth * .7f, Camera.main.pixelHeight * .6f);
 			}
 			GUI.enabled = true;
 		}
 		GUILayout.EndHorizontal();
 		if (GUILayout.Button("Main Menu", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))) {
-			guiSystem.ChangeGUIState(new MenuState(guiSystem));
+			GameObject.Find("math_fusion").renderer.enabled = true;
+			var menu = new MenuState(guiSystem);
+			guiSystem.ChangeGUIState(menu, menu.ShowGUI);
 		}
 		GUILayout.EndArea();
 	}
@@ -168,6 +178,7 @@ class IngredientsState : GUIState {
 			dad.IngredientsChanged += (list, count) => {
 				validIngredients = count == cuttingBoard.maxIngredients;
 			};
+			dad.TriggerIngredientsChanged();
 		}
 		showGUI = false;
 	}
@@ -200,7 +211,8 @@ class IngredientsState : GUIState {
 		}
 		GUI.enabled = true;
 		if (GUILayout.Button("Back", guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {
-			guiSystem.ChangeGUIState(new MenuState(guiSystem));
+			var menu = new MenuState(guiSystem);
+			guiSystem.ChangeGUIState(menu, menu.ShowGUI);
 		}
 		GUILayout.EndArea();
 	}
@@ -332,7 +344,9 @@ public class GameState : GUIState {
 				GameObject.Destroy(gf);
 			}
 			Camera.main.transform.position = GameObject.Find("MenuCameraPosition").transform.position;
-			guiSystem.ChangeGUIState(new MenuState(guiSystem), guiSystem.ResetGame);
+			var menu = new MenuState(guiSystem);
+			menu.ShowGUI();
+			guiSystem.ChangeGUIState(menu, guiSystem.ResetGame);
 			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<CuttingBoard>().ingredients.Clear();
 			GameObject.FindGameObjectWithTag("Cutting Board").GetComponent<ManageMath>().GenerateMath();
 			//			GameState gs = new GameState();
@@ -418,6 +432,8 @@ class NutritionState : GUIState {
 		GUILayout.BeginArea(new Rect(Camera.main.pixelWidth * .525f, Camera.main.pixelHeight * .4f, Camera.main.pixelWidth * .3f, Camera.main.pixelHeight * .2f));
 		IngredientsState ingredientsState = new IngredientsState(guiSystem);
 		ingredientsState.ShowGUI();
+		var menu = new MenuState(guiSystem);
+		menu.ShowGUI();
 		foreach (var fakeTuple in new[] {
 			new FakeTuple {
 				ButtonName = "Play Again",
@@ -426,7 +442,7 @@ class NutritionState : GUIState {
 			},
 			new FakeTuple {
 				ButtonName = "Main Menu",
-				NextState = new MenuState(guiSystem),
+				NextState = menu,
 				CameraName = "MenuCameraPosition"
 			} }) {
 			if (GUILayout.Button(fakeTuple.ButtonName, guiSystem.ourSkin.button, GUILayout.ExpandHeight(true))) {

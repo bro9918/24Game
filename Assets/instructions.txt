@@ -1,7 +1,0 @@
-In Math Fusion, you are a master chef! You have a variety of ingredients to work with, and you're hoping to achieve the perfect flavor in your dishes.
-
-In the first section of the game, you'll select the ingredients that you want to cook with by simply dragging them from the countertop onto the cutting board. There will be a number at the top of the screen to let you know how many ingredients you still need to select. Once you've selected all of your ingredients, you can continue to the next section by clicking the "Cook" button at the bottom of the screen.
-
-In the cooking section of the game, you can combine your ingredients by dragging the mathematical operators into the boxes at the top of the screen. The goal is to combine the ingredient numbers using the operators in order to total to the perfect flavor number, which is displayed in the top right corner of the screen.
-
-After completing the cooking process, you will be taken to the results screen. Here you can view the nutritional information of the meal you cooked, which is based on the ingredients that you chose. 

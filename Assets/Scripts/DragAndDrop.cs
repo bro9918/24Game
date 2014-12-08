@@ -45,15 +45,19 @@ public class DragAndDrop : MonoBehaviour {
 
 	}
 
+	public void TriggerIngredientsChanged() {
+		if (IngredientsChanged != null) {
+			IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredients.Count);
+		}
+	}
+
 	void OnMouseDown() {
 		if (this.tag == "Ingredient") {
 			grabbedObject = gameObject;
 			if (onBoard) {
 				cuttingBoardScript.ingredients.Remove(this.gameObject);
 				cuttingBoardScript.ingredients.Remove(grabbedObject);
-				if(IngredientsChanged != null) {
-					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredients.Count);
-				}
+				TriggerIngredientsChanged();
 			}
 
 		}
@@ -111,9 +115,7 @@ public class DragAndDrop : MonoBehaviour {
 			if (Vector3.Distance(grabbedObject.transform.position, slotLocation) == 0) {
 				cuttingBoardScript.ingredients.Add(gameObject);
 				onBoard = true;
-				if(IngredientsChanged != null) {
-					IngredientsChanged(cuttingBoardScript.ingredients.Cast<GameObject>().ToArray(), cuttingBoardScript.ingredients.Count);
-				}
+				TriggerIngredientsChanged();
 			} else {
 				onBoard = false;
 			}
